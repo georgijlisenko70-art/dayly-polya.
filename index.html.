@@ -1,0 +1,159 @@
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DAYLY POLYA💕</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 22px 17px 35px;
+  background: #fff7fa;
+  color: #684b5a;
+  font-family: Arial, sans-serif;
+}
+header { margin: 12px 0 24px; }
+h1 { color: #c87599; font-size: 27px; margin: 0; }
+.subtitle { color: #b58da1; font-size: 12px; margin-top: 7px; }
+.card {
+  background: white;
+  border-radius: 19px;
+  padding: 19px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 16px #e9cbd633;
+}
+.small { color: #ad8b9e; font-size: 12px; }
+.balance {
+  color: #d69b36;
+  font-size: 30px;
+  font-weight: bold;
+  margin-top: 9px;
+}
+h2 { font-size: 17px; margin: 0 0 15px; }
+.task {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 13px 0;
+  border-bottom: 1px solid #f6eaf0;
+}
+.task:last-child { border: 0; }
+.task-info { flex: 1; }
+.task-name { font-size: 14px; font-weight: 600; }
+.task-time { color: #b58da1; font-size: 11px; margin-bottom: 5px; }
+.coins { color: #c18a45; font-size: 11px; margin-top: 5px; }
+input[type=checkbox] {
+  width: 21px;
+  height: 21px;
+  accent-color: #d879a0;
+}
+.progress {
+  height: 8px;
+  background: #f7e6ed;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-top: 12px;
+}
+#bar {
+  height: 100%;
+  width: 0%;
+  background: #de91b1;
+  transition: .3s;
+}
+#count { color: #b85f87; font-weight: bold; }
+footer {
+  text-align: center;
+  color: #c08ba5;
+  font-size: 11px;
+  padding: 15px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>DAYLY POLYA💕</h1>
+  <div class="subtitle">YOUR LITTLE DAILY WORLD 🌸</div>
+</header>
+
+<div class="card">
+  <div class="small">ТВІЙ БАЛАНС</div>
+  <div class="balance"><span id="balance">120</span> DC ◈</div>
+  <div class="small">Кожен маленький крок має значення 💗</div>
+</div>
+
+<div class="card">
+  <h2>Мій день 🌸</h2>
+  <div class="small">Виконано: <span id="count">0/0</span></div>
+  <div class="progress"><div id="bar"></div></div>
+</div>
+
+<div class="card">
+  <h2>План на сьогодні</h2>
+  <div id="tasks"></div>
+</div>
+
+<div class="card">
+  <h2>🎁 Мої нагороди</h2>
+  <div class="small">Тут незабаром з'явиться твій магазин подарунків!</div>
+</div>
+
+<footer>MADE WITH LOVE 💗 DAYLY POLYA</footer>
+
+<script>
+const tasks = [
+  {time:"08:00",name:"Прокинутися та вмитися",xp:10},
+  {time:"08:30",name:"Сніданок",xp:10},
+  {time:"10:00",name:"Навчання / важливі справи",xp:20},
+  {time:"13:00",name:"Обід та відпочинок",xp:10},
+  {time:"16:00",name:"Час для себе",xp:15},
+  {time:"21:00",name:"Вечірній догляд",xp:10}
+];
+
+let balance = 120;
+let completed = new Set();
+
+function render() {
+  const container = document.getElementById("tasks");
+  container.innerHTML = "";
+
+  tasks.forEach((task,i) => {
+    const checked = completed.has(i);
+    const item = document.createElement("div");
+    item.className = "task";
+    item.innerHTML = `
+      <div class="task-info">
+        <div class="task-time">${task.time}</div>
+        <div class="task-name">${task.name}</div>
+        <div class="coins">+${task.xp} DC ◈</div>
+      </div>
+      <input type="checkbox" ${checked ? "checked" : ""}>
+    `;
+
+    item.querySelector("input").addEventListener("change", e => {
+      if (e.target.checked) {
+        completed.add(i);
+        balance += task.xp;
+      } else {
+        completed.delete(i);
+        balance -= task.xp;
+      }
+      render();
+    });
+
+    container.appendChild(item);
+  });
+
+  document.getElementById("balance").textContent = balance;
+  document.getElementById("count").textContent =
+    completed.size + "/" + tasks.length;
+  document.getElementById("bar").style.width =
+    (completed.size / tasks.length * 100) + "%";
+}
+
+render();
+</script>
+</body>
+</html>
