@@ -8,40 +8,48 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#fff7fb;color:#44313c;font-family:Arial}
+body{margin:0;background:#fff7fb;color:#44313c;font-family:Arial,sans-serif}
 header{background:#f4b4d1;padding:25px 22px;border-radius:0 0 27px 27px}
 header h1{margin:0;font-size:25px}
 header p{margin-bottom:0;color:#744d60}
 main{padding:18px 18px 100px}
-.balance,.card{background:white;padding:19px;border-radius:19px;margin:13px 0;box-shadow:0 3px 12px #efdce6}
-.balance small{color:#98798a}
+.balance,.card{background:white;padding:18px;border-radius:19px;margin:13px 0;box-shadow:0 3px 12px #efdce6}
+.balance small,.muted{color:#98798a}
 .coins{font-size:29px;color:#d65c98;font-weight:bold;margin-top:7px}
 h2{font-size:19px;margin-top:23px}
-button{border:0;border-radius:12px;padding:11px 14px;background:#ed8cba;color:white;font-weight:bold}
+button{border:0;border-radius:12px;padding:11px 14px;background:#ed8cba;color:white;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5}
+input{padding:12px;border:1px solid #f0c7da;border-radius:12px;width:100%;margin:7px 0;font-size:15px}
 .row{display:flex;justify-content:space-between;align-items:center;gap:10px}
-nav{position:fixed;bottom:0;left:0;width:100%;background:white;display:flex;justify-content:space-around;padding:12px 2px;box-shadow:0 -3px 15px #eedde6}
+nav{position:fixed;bottom:0;left:0;width:100%;background:white;display:flex;justify-content:space-around;padding:11px 2px;box-shadow:0 -3px 15px #eedde6}
 nav button{background:white;color:#966b80;font-size:11px;padding:8px 5px}
 nav button.active{color:#dc5798}
 .page{display:none}
 .page.active{display:block}
-input{padding:12px;border:1px solid #f0c7da;border-radius:12px;width:100%;margin:8px 0}
 .task.done{opacity:.55}
 .task.done .taskname{text-decoration:line-through}
-.muted{color:#98798a;font-size:13px}
+.product{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.product button{white-space:nowrap}
+.admin-title{color:#d65c98}
+.smallbtn{padding:7px 10px;font-size:12px}
+.danger{background:#bd6484}
+.adminbox{background:#fff0f7;border:1px solid #f1c4d9}
 </style>
 </head>
 <body>
+
 <header>
-<h1>DAYLY POLYA💕</h1>
+<h1 id="logo">DAYLY POLYA💕</h1>
 <p>Твій простір маленьких перемог</p>
 </header>
+
 <main>
 <section id="home" class="page active">
 <div class="balance">
 <small>ТВІЙ БАЛАНС</small>
 <div class="coins" id="balance">♡ 120 DC</div>
 </div>
-<h2>Привіт! 💗</h2>
+<h2 id="greeting">Привіт! 💗</h2>
 <p>Нехай сьогодні буде чудовим!</p>
 <h2>Завдання на сьогодні</h2>
 <div id="homeTasks"></div>
@@ -49,11 +57,6 @@ input{padding:12px;border:1px solid #f0c7da;border-radius:12px;width:100%;margin
 
 <section id="tasks" class="page">
 <h2>🌸 Мої завдання</h2>
-<div class="card">
-<input id="taskInput" placeholder="Нове завдання...">
-<input id="rewardInput" type="number" placeholder="Нагорода DC" value="10">
-<button onclick="addTask()">Додати завдання +</button>
-</div>
 <div id="allTasks"></div>
 </section>
 
@@ -73,7 +76,7 @@ input{padding:12px;border:1px solid #f0c7da;border-radius:12px;width:100%;margin
 <small>ПОТОЧНИЙ БАЛАНС</small>
 <div class="coins" id="walletBalance">120 DC</div>
 </div>
-<h2>Історія</h2>
+<h2>Історія операцій</h2>
 <div id="history"></div>
 </section>
 
@@ -86,39 +89,215 @@ input{padding:12px;border:1px solid #f0c7da;border-radius:12px;width:100%;margin
 </div>
 <div class="card" id="stats"></div>
 </section>
+
+<section id="shop" class="page">
+<h2>🛍 Магазин POLYA</h2>
+<p class="muted">Обирай винагороди за свої DC 💗</p>
+<div class="balance">
+<small>ТВІЙ БАЛАНС</small>
+<div class="coins" id="shopBalance">120 DC</div>
+</div>
+<div id="products"></div>
+</section>
+
+<section id="admin" class="page">
+<h2 class="admin-title">⚙️ Адмін-панель</h2>
+<p class="muted">Керування DAYLY POLYA💕</p>
+
+<div class="card adminbox">
+<h3>🌸 Створити завдання</h3>
+<input id="newTask" placeholder="Назва завдання">
+<input id="newReward" type="number" min="0" placeholder="Нагорода в DC">
+<button onclick="adminAddTask()">Опублікувати завдання</button>
+</div>
+
+<h3>Управління завданнями</h3>
+<div id="adminTasks"></div>
+
+<div class="card adminbox">
+<h3>🛍 Додати товар</h3>
+<input id="newProduct" placeholder="Назва товару">
+<input id="newDescription" placeholder="Опис товару">
+<input id="newPrice" type="number" min="0" placeholder="Ціна в DC">
+<button onclick="adminAddProduct()">Додати товар</button>
+</div>
+
+<h3>Управління магазином</h3>
+<div id="adminProducts"></div>
+
+<button class="danger" onclick="adminLogout()">Вийти з адмінки</button>
+</section>
 </main>
 
-<nav>
+<nav id="navigation">
 <button class="active" onclick="showPage('home',this)">🏠<br>Головна</button>
 <button onclick="showPage('tasks',this)">🌸<br>Завдання</button>
 <button onclick="showPage('schedule',this)">📅<br>Розклад</button>
+<button onclick="showPage('shop',this)">🛍<br>Магазин</button>
 <button onclick="showPage('wallet',this)">♡<br>DC</button>
 <button onclick="showPage('profile',this)">👤<br>Профіль</button>
 </nav>
 
 <script>
 const $=id=>document.getElementById(id);
+
+// ПАРОЛЬ АДМІНКИ
+const ADMIN_PASSWORD='POLYA2026';
+
 let data=JSON.parse(localStorage.getItem('daylyData')||'null')||{
-balance:120,tasks:[],events:[],history:[],name:'',completed:0
+balance:120,
+tasks:[],
+events:[],
+history:[],
+products:[],
+name:'',
+completed:0
 };
+
+let isAdmin=false;
+let logoClicks=0;
+let logoTimer;
+
+function escapeHTML(s){
+return String(s).replace(/[&<>"']/g,c=>({
+'&':'&amp;','<':'&lt;','>':'&gt;',
+'"':'&quot;',"'":'&#39;'
+}[c]));
+}
+
 function save(){
 localStorage.setItem('daylyData',JSON.stringify(data));
 render();
 }
+
 function showPage(id,btn){
+if(id==='admin'&&!isAdmin)return;
 document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
 $(id).classList.add('active');
 document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
-btn.classList.add('active');
+if(btn)btn.classList.add('active');
 }
-function addTask(){
-let name=$('taskInput').value.trim();
-let reward=Math.max(0,Number($('rewardInput').value)||0);
-if(!name)return alert('Введи назву завдання');
+
+$('logo').addEventListener('click',()=>{
+logoClicks++;
+clearTimeout(logoTimer);
+logoTimer=setTimeout(()=>logoClicks=0,1500);
+if(logoClicks>=5){
+logoClicks=0;
+adminLogin();
+}
+});
+
+function adminLogin(){
+if(isAdmin){
+openAdmin();
+return;
+}
+let pass=prompt('Введи пароль адміністратора:');
+if(pass===null)return;
+if(pass===ADMIN_PASSWORD){
+isAdmin=true;
+openAdmin();
+alert('Вітаю в адмін-панелі 💗');
+}else{
+alert('Неправильний пароль!');
+}
+}
+
+function openAdmin(){
+showPage('admin',null);
+render();
+}
+
+function adminLogout(){
+isAdmin=false;
+showPage('home',document.querySelector('nav button'));
+}
+
+function adminAddTask(){
+let name=$('newTask').value.trim();
+let reward=Number($('newReward').value);
+if(!name||$('newReward').value===''||!Number.isFinite(reward)||reward<0){
+return alert('Перевір назву та нагороду');
+}
 data.tasks.push({name,reward,done:false});
-$('taskInput').value='';
+$('newTask').value='';
+$('newReward').value='';
+save();
+alert('Завдання опубліковано 💗');
+}
+
+function adminEditTask(i){
+let t=data.tasks[i];
+if(!t)return;
+let name=prompt('Нова назва:',t.name);
+if(name===null)return;
+let reward=prompt('Нова нагорода DC:',t.reward);
+if(reward===null)return;
+if(!name.trim()||!Number.isFinite(Number(reward))||Number(reward)<0){
+return alert('Некоректні дані');
+}
+t.name=name.trim();
+t.reward=Number(reward);
 save();
 }
+
+function adminDeleteTask(i){
+if(!confirm('Видалити це завдання?'))return;
+data.tasks.splice(i,1);
+save();
+}
+
+function adminAddProduct(){
+let name=$('newProduct').value.trim();
+let description=$('newDescription').value.trim();
+let price=Number($('newPrice').value);
+if(!name||$('newPrice').value===''||!Number.isFinite(price)||price<0){
+return alert('Перевір назву та ціну');
+}
+data.products.push({name,description,price});
+$('newProduct').value='';
+$('newDescription').value='';
+$('newPrice').value='';
+save();
+alert('Товар додано до магазину 💗');
+}
+
+function adminEditProduct(i){
+let p=data.products[i];
+if(!p)return;
+let name=prompt('Назва товару:',p.name);
+if(name===null)return;
+let description=prompt('Опис:',p.description);
+if(description===null)return;
+let price=prompt('Ціна в DC:',p.price);
+if(price===null)return;
+if(!name.trim()||!Number.isFinite(Number(price))||Number(price)<0){
+return alert('Некоректні дані');
+}
+p.name=name.trim();
+p.description=description;
+p.price=Number(price);
+save();
+}
+
+function adminDeleteProduct(i){
+if(!confirm('Видалити товар?'))return;
+data.products.splice(i,1);
+save();
+}
+
+function buyProduct(i){
+let p=data.products[i];
+if(!p)return;
+if(data.balance<p.price)return alert('Недостатньо DC 💗');
+if(!confirm('Купити '+p.name+' за '+p.price+' DC?'))return;
+data.balance-=p.price;
+data.history.unshift('−'+p.price+' DC — Покупка: '+p.name);
+save();
+alert('Покупку оформлено! 💗');
+}
+
 function completeTask(i){
 let t=data.tasks[i];
 if(!t||t.done)return;
@@ -128,34 +307,83 @@ data.completed++;
 data.history.unshift('+'+t.reward+' DC — '+t.name);
 save();
 }
+
 function addEvent(){
-let name=$('eventInput').value.trim(),date=$('eventDate').value;
+let name=$('eventInput').value.trim();
+let date=$('eventDate').value;
 if(!name||!date)return alert('Заповни назву та дату');
 data.events.push({name,date});
 $('eventInput').value='';
 save();
 }
+
 function saveName(){
 data.name=$('username').value.trim();
 save();
 alert('Профіль збережено 💗');
 }
+
 function render(){
 $('balance').textContent='♡ '+data.balance+' DC';
 $('walletBalance').textContent=data.balance+' DC';
+$('shopBalance').textContent=data.balance+' DC';
 $('username').value=data.name;
-$('stats').innerHTML='Виконано завдань: <b>'+data.completed+'</b><br>Завдань усього: <b>'+data.tasks.length+'</b>';
+$('greeting').textContent=data.name?'Привіт, '+data.name+'! 💗':'Привіт! 💗';
+
+$('stats').innerHTML=
+'Виконано завдань: <b>'+data.completed+'</b><br>'+
+'Завдань усього: <b>'+data.tasks.length+'</b>';
+
 let tasks=data.tasks.map((t,i)=>`
 <div class="card row task ${t.done?'done':''}">
-<div><b class="taskname">${t.name}</b><br><span class="muted">+${t.reward} DC</span></div>
+<div><b class="taskname">${escapeHTML(t.name)}</b><br>
+<span class="muted">+${t.reward} DC</span></div>
 ${t.done?'✓ Готово':`<button onclick="completeTask(${i})">Виконано</button>`}
 </div>`).join('');
-$('allTasks').innerHTML=tasks||'<p class="muted">Тут поки немає завдань</p>';
-$('homeTasks').innerHTML=tasks||'<p class="muted">Додай своє перше завдання 🌸</p>';
-$('events').innerHTML=data.events.map(e=>`<div class="card"><b>${e.name}</b><br><span class="muted">${new Date(e.date).toLocaleString('uk-UA')}</span></div>`).join('')||'<p class="muted">Розклад поки порожній</p>';
-$('history').innerHTML=data.history.map(h=>`<div class="card">${h}</div>`).join('')||'<p class="muted">Історія поки порожня</p>';
+
+$('allTasks').innerHTML=tasks||'<p class="muted">Завдань поки немає 🌸</p>';
+$('homeTasks').innerHTML=tasks||'<p class="muted">Завдань поки немає 🌸</p>';
+
+$('events').innerHTML=data.events.map(e=>`
+<div class="card"><b>${escapeHTML(e.name)}</b><br>
+<span class="muted">${new Date(e.date).toLocaleString('uk-UA')}</span></div>
+`).join('')||'<p class="muted">Розклад поки порожній</p>';
+
+$('history').innerHTML=data.history.map(h=>
+`<div class="card">${escapeHTML(h)}</div>`
+).join('')||'<p class="muted">Історія поки порожня</p>';
+
+$('products').innerHTML=data.products.map((p,i)=>`
+<div class="card product">
+<div><b>${escapeHTML(p.name)}</b><br>
+<span class="muted">${escapeHTML(p.description||'')}</span><br>
+<strong>${p.price} DC</strong></div>
+<button onclick="buyProduct(${i})">Купити</button>
+</div>
+`).join('')||'<p class="muted">Магазин скоро поповниться 💗</p>';
+
+$('adminTasks').innerHTML=data.tasks.map((t,i)=>`
+<div class="card">
+<b>${escapeHTML(t.name)}</b> — ${t.reward} DC
+<div class="row" style="margin-top:10px">
+<button class="smallbtn" onclick="adminEditTask(${i})">Редагувати</button>
+<button class="smallbtn danger" onclick="adminDeleteTask(${i})">Видалити</button>
+</div>
+</div>`).join('')||'<p class="muted">Завдань немає</p>';
+
+$('adminProducts').innerHTML=data.products.map((p,i)=>`
+<div class="card">
+<b>${escapeHTML(p.name)}</b><br>
+${p.price} DC
+<div class="row" style="margin-top:10px">
+<button class="smallbtn" onclick="adminEditProduct(${i})">Редагувати</button>
+<button class="smallbtn danger" onclick="adminDeleteProduct(${i})">Видалити</button>
+</div>
+</div>`).join('')||'<p class="muted">Товарів немає</p>';
 }
+
 render();
+
 if(window.Telegram?.WebApp){
 Telegram.WebApp.ready();
 Telegram.WebApp.expand();
