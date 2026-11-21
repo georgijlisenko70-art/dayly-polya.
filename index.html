@@ -1,0 +1,258 @@
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DAYLY POLYA💕</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 22px 17px 35px;
+  background: #fff7fa;
+  color: #684b5a;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  margin: 12px 0 24px;
+}
+
+h1 {
+  color: #c87599;
+  font-size: 27px;
+  margin: 0;
+}
+
+.subtitle {
+  color: #b58da1;
+  font-size: 12px;
+  margin-top: 7px;
+}
+
+.card {
+  background: white;
+  border-radius: 19px;
+  padding: 19px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 16px #e9cbd633;
+}
+
+.small {
+  color: #ad8b9e;
+  font-size: 12px;
+}
+
+.balance {
+  color: #d69b36;
+  font-size: 30px;
+  font-weight: bold;
+  margin-top: 9px;
+}
+
+.progress-bg {
+  height: 9px;
+  background: #f8e5ed;
+  border-radius: 20px;
+  margin-top: 13px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: #de91b1;
+  border-radius: 20px;
+  transition: width .3s;
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid #f8edf2;
+}
+
+.task:last-child {
+  border-bottom: none;
+}
+
+.task input {
+  width: 20px;
+  height: 20px;
+  accent-color: #d985a8;
+}
+
+.task-info {
+  flex: 1;
+}
+
+.task-name {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.task-time {
+  color: #ad8b9e;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.reward {
+  color: #d69b36;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.done .task-name {
+  text-decoration: line-through;
+  color: #bdaab4;
+}
+
+h2 {
+  font-size: 17px;
+  margin: 0 0 14px;
+  color: #a96587;
+}
+
+.footer {
+  text-align: center;
+  color: #c4a7b6;
+  font-size: 11px;
+  margin-top: 25px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>DAYLY POLYA💕</h1>
+  <div class="subtitle">Твій маленький простір турботи 🌷</div>
+</header>
+
+<div class="card">
+  <div class="small">ТВІЙ БАЛАНС</div>
+  <div class="balance"><span id="balance">120</span> DC</div>
+  <div class="small">Ти молодець! Продовжуй 💗</div>
+</div>
+
+<div class="card">
+  <h2>Прогрес дня 🌸</h2>
+  <div class="small">
+    Виконано <span id="completed">0</span> із
+    <span id="total">6</span> завдань
+  </div>
+
+  <div class="progress-bg">
+    <div class="progress-fill" id="progress"></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Твій розклад 🩷</h2>
+  <div id="tasks"></div>
+</div>
+
+<div class="card">
+  <h2>Магазин подарунків 🎁</h2>
+  <div class="small">
+    Тут незабаром з'являться винагороди за твої DC.
+  </div>
+</div>
+
+<div class="footer">
+  Made with love 💕
+</div>
+
+<script>
+let balance = 120;
+
+const taskList = [
+  { time: "08:00", name: "Прокинутися та вмитися", reward: 10 },
+  { time: "08:30", name: "Поснідати", reward: 10 },
+  { time: "10:00", name: "Навчання / важливі справи", reward: 20 },
+  { time: "13:00", name: "Обід та відпочинок", reward: 10 },
+  { time: "16:00", name: "Час для себе", reward: 15 },
+  { time: "21:00", name: "Вечірній догляд", reward: 10 }
+];
+
+const completedTasks = new Set();
+
+function renderTasks() {
+  const container = document.getElementById("tasks");
+  container.innerHTML = "";
+
+  taskList.forEach((task, index) => {
+    const isDone = completedTasks.has(index);
+
+    const row = document.createElement("div");
+    row.className = "task" + (isDone ? " done" : "");
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = isDone;
+
+    checkbox.addEventListener("change", () => {
+      if (checkbox.checked) {
+        completedTasks.add(index);
+        balance += task.reward;
+      } else {
+        completedTasks.delete(index);
+        balance -= task.reward;
+      }
+
+      update();
+    });
+
+    const info = document.createElement("div");
+    info.className = "task-info";
+
+    const name = document.createElement("div");
+    name.className = "task-name";
+    name.textContent = task.name;
+
+    const time = document.createElement("div");
+    time.className = "task-time";
+    time.textContent = task.time;
+
+    info.appendChild(name);
+    info.appendChild(time);
+
+    const reward = document.createElement("div");
+    reward.className = "reward";
+    reward.textContent = "+" + task.reward + " DC";
+
+    row.appendChild(checkbox);
+    row.appendChild(info);
+    row.appendChild(reward);
+
+    container.appendChild(row);
+  });
+}
+
+function update() {
+  document.getElementById("balance").textContent = balance;
+
+  const count = completedTasks.size;
+  const total = taskList.length;
+  const percent = total ? (count / total) * 100 : 0;
+
+  document.getElementById("completed").textContent = count;
+  document.getElementById("total").textContent = total;
+  document.getElementById("progress").style.width = percent + "%";
+
+  renderTasks();
+}
+
+update();
+</script>
+
+</body>
+</html>
