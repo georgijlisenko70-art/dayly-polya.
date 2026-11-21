@@ -3,25 +3,31 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>DAYLY POLYA💕</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#fff7fb;color:#382b34;font-family:Arial,sans-serif}
-header{background:#f6b8d5;padding:28px 22px;border-radius:0 0 28px 28px}
-h1{margin:0;font-size:27px}
-header p{margin:8px 0 0;color:#70465c}
-.balance{margin:20px;background:white;padding:20px;border-radius:20px;box-shadow:0 3px 15px #f0dce7}
-.balance small{color:#98778a}
-.coins{font-size:30px;font-weight:bold;margin-top:8px;color:#d45b99}
-main{padding:0 20px 100px}
-h2{font-size:19px;margin-top:25px}
-.card{background:white;border-radius:17px;padding:17px;margin:12px 0;box-shadow:0 3px 12px #f3e4ed}
-.item{display:flex;justify-content:space-between;align-items:center}
-button{background:#ed8cbb;color:white;border:0;border-radius:12px;padding:11px 17px;font-weight:bold}
-nav{position:fixed;bottom:0;left:0;width:100%;background:white;display:flex;justify-content:space-around;padding:15px 5px;box-shadow:0 -3px 15px #f0dce7}
-nav button{background:transparent;color:#8d7181;font-size:12px;padding:8px}
+body{margin:0;background:#fff7fb;color:#44313c;font-family:Arial}
+header{background:#f4b4d1;padding:25px 22px;border-radius:0 0 27px 27px}
+header h1{margin:0;font-size:25px}
+header p{margin-bottom:0;color:#744d60}
+main{padding:18px 18px 100px}
+.balance,.card{background:white;padding:19px;border-radius:19px;margin:13px 0;box-shadow:0 3px 12px #efdce6}
+.balance small{color:#98798a}
+.coins{font-size:29px;color:#d65c98;font-weight:bold;margin-top:7px}
+h2{font-size:19px;margin-top:23px}
+button{border:0;border-radius:12px;padding:11px 14px;background:#ed8cba;color:white;font-weight:bold}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+nav{position:fixed;bottom:0;left:0;width:100%;background:white;display:flex;justify-content:space-around;padding:12px 2px;box-shadow:0 -3px 15px #eedde6}
+nav button{background:white;color:#966b80;font-size:11px;padding:8px 5px}
+nav button.active{color:#dc5798}
+.page{display:none}
+.page.active{display:block}
+input{padding:12px;border:1px solid #f0c7da;border-radius:12px;width:100%;margin:8px 0}
+.task.done{opacity:.55}
+.task.done .taskname{text-decoration:line-through}
+.muted{color:#98798a;font-size:13px}
 </style>
 </head>
 <body>
@@ -29,44 +35,130 @@ nav button{background:transparent;color:#8d7181;font-size:12px;padding:8px}
 <h1>DAYLY POLYA💕</h1>
 <p>Твій простір маленьких перемог</p>
 </header>
+<main>
+<section id="home" class="page active">
 <div class="balance">
 <small>ТВІЙ БАЛАНС</small>
-<div class="coins">♡ 120 DC</div>
+<div class="coins" id="balance">♡ 120 DC</div>
 </div>
-<main>
 <h2>Привіт! 💗</h2>
-<p>Час зробити щось чудове сьогодні.</p>
-<h2>Мої завдання</h2>
-<div class="card item">
-<div>🌸 Ранкові справи<br><small>+10 DC</small></div>
-<button onclick="complete(this)">Виконано</button>
+<p>Нехай сьогодні буде чудовим!</p>
+<h2>Завдання на сьогодні</h2>
+<div id="homeTasks"></div>
+</section>
+
+<section id="tasks" class="page">
+<h2>🌸 Мої завдання</h2>
+<div class="card">
+<input id="taskInput" placeholder="Нове завдання...">
+<input id="rewardInput" type="number" placeholder="Нагорода DC" value="10">
+<button onclick="addTask()">Додати завдання +</button>
 </div>
-<div class="card item">
-<div>📚 Навчання<br><small>+20 DC</small></div>
-<button onclick="complete(this)">Виконано</button>
+<div id="allTasks"></div>
+</section>
+
+<section id="schedule" class="page">
+<h2>📅 Мій розклад</h2>
+<div class="card">
+<input id="eventInput" placeholder="Назва справи">
+<input id="eventDate" type="datetime-local">
+<button onclick="addEvent()">Додати в розклад +</button>
 </div>
-<div class="card item">
-<div>✨ Особистий час<br><small>+15 DC</small></div>
-<button onclick="complete(this)">Виконано</button>
+<div id="events"></div>
+</section>
+
+<section id="wallet" class="page">
+<h2>♡ Мої DC</h2>
+<div class="balance">
+<small>ПОТОЧНИЙ БАЛАНС</small>
+<div class="coins" id="walletBalance">120 DC</div>
 </div>
-<h2>Нагадування</h2>
-<div class="card">💕 Кожен маленький крок має значення!</div>
+<h2>Історія</h2>
+<div id="history"></div>
+</section>
+
+<section id="profile" class="page">
+<h2>👤 Мій профіль</h2>
+<div class="card">
+<p class="muted">ІМ'Я</p>
+<input id="username" placeholder="Твоє ім'я">
+<button onclick="saveName()">Зберегти</button>
+</div>
+<div class="card" id="stats"></div>
+</section>
 </main>
+
 <nav>
-<button onclick="location.reload()">🏠<br>Головна</button>
-<button onclick="alert('Розділ завдань')">🌸<br>Завдання</button>
-<button onclick="alert('Твій баланс: '+balance+' DC')">♡<br>DC</button>
-<button onclick="alert('Профіль користувача')">👤<br>Профіль</button>
+<button class="active" onclick="showPage('home',this)">🏠<br>Головна</button>
+<button onclick="showPage('tasks',this)">🌸<br>Завдання</button>
+<button onclick="showPage('schedule',this)">📅<br>Розклад</button>
+<button onclick="showPage('wallet',this)">♡<br>DC</button>
+<button onclick="showPage('profile',this)">👤<br>Профіль</button>
 </nav>
+
 <script>
-let balance=120;
-function complete(btn){
-if(btn.disabled)return;
-let amount=Number(btn.parentElement.querySelector('small').textContent.match(/\d+/)[0]);
-balance+=amount;
-document.querySelector('.coins').textContent='♡ '+balance+' DC';
-btn.textContent='Готово ✓';
-btn.disabled=true;
+const $=id=>document.getElementById(id);
+let data=JSON.parse(localStorage.getItem('daylyData')||'null')||{
+balance:120,tasks:[],events:[],history:[],name:'',completed:0
+};
+function save(){
+localStorage.setItem('daylyData',JSON.stringify(data));
+render();
+}
+function showPage(id,btn){
+document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+$(id).classList.add('active');
+document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+btn.classList.add('active');
+}
+function addTask(){
+let name=$('taskInput').value.trim();
+let reward=Math.max(0,Number($('rewardInput').value)||0);
+if(!name)return alert('Введи назву завдання');
+data.tasks.push({name,reward,done:false});
+$('taskInput').value='';
+save();
+}
+function completeTask(i){
+let t=data.tasks[i];
+if(!t||t.done)return;
+t.done=true;
+data.balance+=t.reward;
+data.completed++;
+data.history.unshift('+'+t.reward+' DC — '+t.name);
+save();
+}
+function addEvent(){
+let name=$('eventInput').value.trim(),date=$('eventDate').value;
+if(!name||!date)return alert('Заповни назву та дату');
+data.events.push({name,date});
+$('eventInput').value='';
+save();
+}
+function saveName(){
+data.name=$('username').value.trim();
+save();
+alert('Профіль збережено 💗');
+}
+function render(){
+$('balance').textContent='♡ '+data.balance+' DC';
+$('walletBalance').textContent=data.balance+' DC';
+$('username').value=data.name;
+$('stats').innerHTML='Виконано завдань: <b>'+data.completed+'</b><br>Завдань усього: <b>'+data.tasks.length+'</b>';
+let tasks=data.tasks.map((t,i)=>`
+<div class="card row task ${t.done?'done':''}">
+<div><b class="taskname">${t.name}</b><br><span class="muted">+${t.reward} DC</span></div>
+${t.done?'✓ Готово':`<button onclick="completeTask(${i})">Виконано</button>`}
+</div>`).join('');
+$('allTasks').innerHTML=tasks||'<p class="muted">Тут поки немає завдань</p>';
+$('homeTasks').innerHTML=tasks||'<p class="muted">Додай своє перше завдання 🌸</p>';
+$('events').innerHTML=data.events.map(e=>`<div class="card"><b>${e.name}</b><br><span class="muted">${new Date(e.date).toLocaleString('uk-UA')}</span></div>`).join('')||'<p class="muted">Розклад поки порожній</p>';
+$('history').innerHTML=data.history.map(h=>`<div class="card">${h}</div>`).join('')||'<p class="muted">Історія поки порожня</p>';
+}
+render();
+if(window.Telegram?.WebApp){
+Telegram.WebApp.ready();
+Telegram.WebApp.expand();
 }
 </script>
 </body>
